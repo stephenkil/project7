@@ -28,34 +28,26 @@ public class SetUp {
 	 */
 	public static void setUpCalculator(CalculatorFace face) {
 		DecimalFormat df = new DecimalFormat("0.#####"); //needed to avoid printing in scientific notation
-		
 		Internals internals = new Internals();
+		Map<Boolean, numButton> caseMap = new HashMap<>(); //map that stores different results to print to the screen for different cases (e.g., is the number 0 or nonzero?)
+		caseMap.put(true, new CurrentEqualsZero()); //the current number is zero
+		caseMap.put(false, new CurrentNotZero()); //the current number is not zero
 		
 		final class numListener implements ActionListener {
-			int n; //the number of the button pressed
+			int n;
 			
 			public numListener(int n) { //constructor for numListener
 				this.n = n;
 			}
 			
-			public double current() { //calculates and returns the current number on the screen based on the number of the button pressed
-				return(internals.current == 0)? internals.current + n : (internals.current*10) + n;
-			}
-			
 			public void actionPerformed(ActionEvent e) {
-				double n = current(); //finds the current number
-				internals.current = n; //sets the current number
-				face.writeToScreen(df.format(n)); //prints the current number
+				boolean currentEqualsZero = internals.current == 0;
+				numButton action = caseMap.get(currentEqualsZero);
+				double toPrint = action.calculate(internals, n);
+				internals.current = toPrint;
+				face.writeToScreen(df.format(toPrint));
 			}
 		}
-		
-		final class PlusListener implements ActionListener {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		}
-		
-		
 		
 		face.addNumberActionListener(0, new numListener(0));
 		face.addNumberActionListener(1, new numListener(1));
@@ -67,7 +59,6 @@ public class SetUp {
 		face.addNumberActionListener(7, new numListener(7));
 		face.addNumberActionListener(8, new numListener(8));
 		face.addNumberActionListener(9, new numListener(9));
-		face.addActionListener('+', new PlusListener());
 		
 	}
 	
