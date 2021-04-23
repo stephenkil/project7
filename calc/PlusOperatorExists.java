@@ -15,13 +15,13 @@ public class PlusOperatorExists implements PlusButton {
 		operationMap.put('*', new Multiplication()); //stores the addition operation
 		operationMap.put('/', new Division()); //stores the addition operation
 		
-		Operation op = operationMap.get(ch);
+		Operation op = operationMap.get(ch); //retrieves which action to take based on the given operator (ch)
 		
 		i.current = op.calculate(i.first, i.current); //calculates and stores the current value
 		i.first = i.current;
 		i.second = Double.MIN_VALUE; //reset
 		i.operation = '+';
 		
-		return i;
+		return i; //returns the updated internals
 	}
 }
