@@ -28,37 +28,72 @@ public class SetUp {
 	 */
 	public static void setUpCalculator(CalculatorFace face) {
 		DecimalFormat df = new DecimalFormat("0.#####"); //needed to avoid printing in scientific notation
-		Internals internals = new Internals();
-		Map<Boolean, numButton> caseMap = new HashMap<>(); //map that stores different results to print to the screen for different cases (e.g., is the number 0 or nonzero?)
-		caseMap.put(true, new CurrentEqualsZero()); //the current number is zero
-		caseMap.put(false, new CurrentNotZero()); //the current number is not zero
+		Internals internals = new Internals(); //initializes the calculator internals
 		
-		final class numListener implements ActionListener {
-			int n;
+		Map<Character, Operation> operationMap = new HashMap<>(); //map that stores the calculation action based on the operator
+		operationMap.put('+', new Addition()); //stores the addition operation
+		operationMap.put('-', new Subtraction()); //stores the addition operation
+		operationMap.put('*', new Multiplication()); //stores the addition operation
+		operationMap.put('/', new Division()); //stores the addition operation
+		
+		Map<Boolean, NumButton> numCaseMap1 = new HashMap<>(); //map that stores calculation action based on whether the current number is zero or not
+		numCaseMap1.put(true, new NumOperatorExists()); //stores the action to be taken if a previous operator exists
+		numCaseMap1.put(false, new NumOperatorNotExist()); //stores the action to be taken if a previous operator does not exist
+		
+		Map<Boolean, NumButton> numCaseMap2 = new HashMap<>(); //map that stores calculation action based on whether the current number is zero or not
+		numCaseMap2.put(true, new CurrentEqualsZero()); //stores the action to be taken if the current number is zero
+		numCaseMap2.put(false, new CurrentNotZero()); //stores the action to be taken if the current number is not zero
+		
+		Map<Boolean, PlusButton> plusCaseMap = new HashMap<>(); //map that stores various calculation actions for the plus operator
+		plusCaseMap.put(true, new PlusOperatorExists());
+		plusCaseMap.put(false, new PlusOperatorNotExist());
+		
+		final class NumListener implements ActionListener {
+			int n; //the number of the button pressed
 			
-			public numListener(int n) { //constructor for numListener
+			public NumListener(int n) { //constructor for numListener
 				this.n = n;
 			}
 			
 			public void actionPerformed(ActionEvent e) {
-				boolean currentEqualsZero = internals.current == 0;
-				numButton action = caseMap.get(currentEqualsZero);
-				double toPrint = action.calculate(internals, n);
-				internals.current = toPrint;
-				face.writeToScreen(df.format(toPrint));
+				boolean currentEqualsZero = internals.current == 0; //true if the current number is 0
+				boolean operatorExists = internals.operation != Character.MIN_VALUE; //stores whether a previous operator exists or not
+				
+				NumButton action1 = numCaseMap1.get(operatorExists); //retrieves which action to take based on whether a previous operator exists or not
+				internals.current = action1.calculate(internals, internals.current); //the current number is calculated from the retrieved course of action
+				
+				NumButton action2 = numCaseMap2.get(currentEqualsZero); //retrieves which action to take based on whether the current number is 0 or not
+				internals.current = action2.calculate(internals, n); //the current number is calculated from the retrieved course of action
+				
+				face.writeToScreen(df.format(internals.current)); //prints the calculated value
 			}
 		}
 		
-		face.addNumberActionListener(0, new numListener(0));
-		face.addNumberActionListener(1, new numListener(1));
-		face.addNumberActionListener(2, new numListener(2));
-		face.addNumberActionListener(3, new numListener(3));
-		face.addNumberActionListener(4, new numListener(4));
-		face.addNumberActionListener(5, new numListener(5));
-		face.addNumberActionListener(6, new numListener(6));
-		face.addNumberActionListener(7, new numListener(7));
-		face.addNumberActionListener(8, new numListener(8));
-		face.addNumberActionListener(9, new numListener(9));
+		final class PlusListener implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				boolean operatorExists = internals.first != Double.MIN_VALUE; //if true, then a prior operator exists
+				PlusButton action = plusCaseMap.get(operatorExists);
+				Internals newInternals = action.calculate(internals.operation, internals);
+				internals.current = newInternals.current;
+				internals.first = newInternals.first;
+				internals.second = newInternals.second;
+				internals.operation = newInternals.operation;
+				face.writeToScreen(df.format(internals.current)); //prints the calculated value
+			}
+		}
+		
+		
+		face.addNumberActionListener(0, new NumListener(0));
+		face.addNumberActionListener(1, new NumListener(1));
+		face.addNumberActionListener(2, new NumListener(2));
+		face.addNumberActionListener(3, new NumListener(3));
+		face.addNumberActionListener(4, new NumListener(4));
+		face.addNumberActionListener(5, new NumListener(5));
+		face.addNumberActionListener(6, new NumListener(6));
+		face.addNumberActionListener(7, new NumListener(7));
+		face.addNumberActionListener(8, new NumListener(8));
+		face.addNumberActionListener(9, new NumListener(9));
+		face.addActionListener('+', new PlusListener());
 		
 	}
 	
