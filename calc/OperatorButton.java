@@ -4,6 +4,6 @@ package calc;
  * Interface for . . .
  */
 
-public interface PlusButton {
+public interface OperatorButton {
 	Internals calculate(Character ch, Internals i);
 }

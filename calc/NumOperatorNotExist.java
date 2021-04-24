@@ -6,7 +6,7 @@ package calc;
 
 public class NumOperatorNotExist implements NumButton {
 	@Override
-	public double calculate(Internals i, double n) { //does not change n, since no previous operator exists
-		return n;
+	public double calculate(Internals i, double n) { //does not change anything, since no previous operator exists
+		return i.current;
 	}
 }

@@ -1,7 +1,7 @@
 package calc;
 
 /**
- * Interface for calculating the number to be printed based on whether the current value equals zero or not.
+ * Interface for calculating the current number based on various courses of action.
  */
 
 public interface NumButton {

@@ -7,7 +7,7 @@ import java.util.Map;
  * Class that stores the course of action to be taken when a previous operator already exists.
  */
 
-public class PlusOperatorExists implements OperatorButton {
+public class MinusOperatorExists implements OperatorButton {
 	public Internals calculate(Character ch, Internals i) {
 		Map<Character, Operation> operationMap = new HashMap<>(); //map that stores the calculation action based on the operator
 		operationMap.put('+', new Addition()); //stores the addition operation
@@ -20,7 +20,7 @@ public class PlusOperatorExists implements OperatorButton {
 		i.current = op.calculate(i.first, i.current); //calculates and stores the current value
 		i.first = i.current;
 		i.second = Double.MIN_VALUE; //reset
-		i.operation = '+';
+		i.operation = '-';
 		
 		return i; //returns the updated internals
 	}
