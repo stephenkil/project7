@@ -7,6 +7,6 @@ package calc;
 public class CurrentEqualsZero implements NumButton {
 	@Override
 	public double calculate(Internals i, double n) {
-		return n;
+		return Math.abs(n);
 	}
 }

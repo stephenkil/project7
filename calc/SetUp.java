@@ -3,10 +3,8 @@ package calc;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
-import java.math.BigDecimal;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.function.BinaryOperator;
 
 /**
  * SetUp
@@ -49,6 +47,10 @@ public class SetUp {
 		decimal.put(true, new Decimal()); //stores the action to be taken if starting a new decimal
 		decimal.put(false, new NoDecimal()); //stores the action to be taken if NOT starting a new decimal
 		
+		Map<Integer, PM> PM = new HashMap<>(); //map that stores whether to convert a number to positive or negative, depending on internals.PM
+		PM.put(1, new Positive()); //stores the action to be taken if converting current to a positive value
+		PM.put(-1, new Negative()); //stores the action to be taken if converting current to a negative value
+		
 		Map<Boolean, OperatorButton> plusCaseMap = new HashMap<>(); //map that stores various calculation actions for the plus operator
 		plusCaseMap.put(true, new PlusOperatorExists()); //stores the action to be taken if a previous operator exists
 		plusCaseMap.put(false, new PlusOperatorNotExist()); //stores the action to be taken if a previous operator does not exist
@@ -73,17 +75,23 @@ public class SetUp {
 			}
 			
 			public void actionPerformed(ActionEvent e) {
+				PM action1 = PM.get(internals.PM); //retrieves whether to make the current value positive or negative
+				
+				n = (int) action1.convert(n); //converts n to positive or negative depending on internals.PM
+				
 				boolean currentEqualsZero = internals.current == 0; //true if the current number is 0
 			
-				NumButton action1 = zeroOrNot.get(currentEqualsZero); //retrieves which action to take based on whether the current number is 0 or not
-				internals.current = action1.calculate(internals, n); //the current number is calculated from the retrieved course of action			
+				NumButton action2 = zeroOrNot.get(currentEqualsZero); //retrieves which action to take based on whether the current number is 0 or not
+				internals.current = action2.calculate(internals, n); //the current number is calculated from the retrieved course of action			
 				
-				NumButton action2 = startNew.get(internals.startNew); //retrieves whether to start a new number input or continue the current input, depending on internals.startNew
-				internals.current = action2.calculate(internals, n); //if startNew = true, sets n (the clicked number) to current, effectively starting a new number. Otherwise, does not alter the current value.
+				NumButton action3 = startNew.get(internals.startNew); //retrieves whether to start a new number input or continue the current input
+				internals.current = action3.calculate(internals, n); //if startNew = true, sets n (the clicked number) to current, effectively starting a new number. Otherwise, does not alter the current value.
 				internals.startNew = false; //resets startNew
 				
-				NumButton action3 = decimal.get(internals.decimal);
-				internals.current = action3.calculate(internals, n);
+				NumButton action4 = decimal.get(internals.decimal); //retrieves whether to start a new decimal point or not
+				internals.current = action4.calculate(internals, n); //applies the corresponding action
+				
+				internals.current = action1.convert(internals.current); //converts the current value to positive or negative depending on internals.PM
 				
 				face.writeToScreen(df.format(internals.current)); //prints the calculated value
 			}
@@ -102,6 +110,7 @@ public class SetUp {
 				internals.current = 0; //resets current
 				internals.decimal = false; //resets decimal
 				internals.decimalString = ""; //resets decimalString
+				internals.PM = 1; //resets PM
 			}
 		}
 		
@@ -118,6 +127,7 @@ public class SetUp {
 				internals.current = 0; //resets current
 				internals.decimal = false; //resets decimal
 				internals.decimalString = ""; //resets decimalString
+				internals.PM = 1; //resets PM
 			}
 		}
 		
@@ -134,6 +144,7 @@ public class SetUp {
 				internals.current = 0; //resets current
 				internals.decimal = false; //resets decimal
 				internals.decimalString = ""; //resets decimalString
+				internals.PM = 1; //resets PM
 			}
 		}
 		
@@ -150,6 +161,7 @@ public class SetUp {
 				internals.current = 0; //resets current
 				internals.decimal = false; //resets decimal
 				internals.decimalString = ""; //resets decimalString
+				internals.PM = 1; //resets PM
 			}
 		}
 		
@@ -163,6 +175,7 @@ public class SetUp {
 				face.writeToScreen(df.format(internals.current)); //prints the calculated value
 				internals.decimal = false; //resets decimal
 				internals.decimalString = ""; //resets decimalString
+				internals.PM = 1; //resets PM
 			}
 		}
 		
@@ -176,12 +189,22 @@ public class SetUp {
 				internals.decimal = false; //resets decimal
 				internals.decimalString = ""; //resets decimalString
 				face.writeToScreen(""); //resets the display
+				internals.PM = 1; //resets PM
 			}
 		}
 		
 		final class DecimalListener implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				internals.decimal = true;
+			}
+		}
+		
+		final class PlusMinusListener implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				internals.PM = internals.PM*(-1); //sets internals.PM to the opposite of whatever it currently is
+				PM action = PM.get(internals.PM); //retrieves which action to take based on whether internals.PM is + or -
+				internals.current = action.convert(internals.current); //calculates and stores the current value accordingly
+				face.writeToScreen(df.format(internals.current)); //prints the calculated value
 			}
 		}
 		
@@ -203,6 +226,7 @@ public class SetUp {
 		face.addActionListener('=', new EqualsListener());
 		face.addActionListener('C', new ClearListener());
 		face.addActionListener('.', new DecimalListener());
+		face.addPlusMinusActionListener(new PlusMinusListener());
 		
 	}
 	

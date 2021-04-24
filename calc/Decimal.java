@@ -7,6 +7,8 @@ package calc;
 public class Decimal implements NumButton {
 	@Override
 	public double calculate(Internals i, double n) {
+		n = Math.abs(n);
+		
 		i.current = (i.current-n)/10; // undoes CurrentNotZero (to avoid duplicates; e.g., 5 . 6 returns 5.6 instead of 56.6)
 		i.decimalString += Integer.toString((int) n);
 		
@@ -14,9 +16,6 @@ public class Decimal implements NumButton {
 		int decimalPosition = currentAsString.indexOf('.');
 		
 		String beforeDecimal = currentAsString.substring(0, decimalPosition);
-		//String afterDecimal = currentAsString.substring(decimalPosition+1);
-		//int beforeDecimal = Integer.parseInt(currentAsString.substring(0, decimalPosition-1));
-		//int afterDecimal = Integer.parseInt(currentAsString.substring(decimalPosition+1));
 		
 		i.current = Double.parseDouble(beforeDecimal + "." + i.decimalString); //adds n behind the decimal point
 		

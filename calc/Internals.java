@@ -20,6 +20,7 @@ public class Internals {
 		this.startNew = false;
 		this.decimal = false;
 		this.decimalString = "";
+		this.PM = 1;
 	}
 
 	public double current;
@@ -29,4 +30,5 @@ public class Internals {
 	public boolean startNew; //when set to true, starts a new number input
 	public boolean decimal; //when set to true, places all subsequent input behind a decimal point
 	public String decimalString;
+	public int PM;
 }

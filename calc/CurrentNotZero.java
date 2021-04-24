@@ -8,6 +8,6 @@ public class CurrentNotZero implements NumButton {
 	@Override
 	public double calculate(Internals i, double n) {
 		//i.current = (i.current*10)+n;
-		return (i.current*10)+n;
+		return (i.current*10)+Math.abs(n);
 	}
 }
